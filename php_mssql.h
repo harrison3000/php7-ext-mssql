@@ -154,7 +154,7 @@ typedef struct {
 } mssql_bind;
 
 ZEND_BEGIN_MODULE_GLOBALS(mssql)
-	long default_link;
+	zend_resource* default_link;
 	long num_links,num_persistent;
 	long max_links,max_persistent;
 	zend_bool allow_persistent;
