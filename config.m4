@@ -38,8 +38,9 @@ if test "$PHP_MSSQL" != "no"; then
     fi
   fi  
 
-  if test ! -r "$FREETDS_INSTALLATION_DIR/$PHP_LIBDIR/libsybdb.a" && test ! -r "$FREETDS_INSTALLATION_DIR/$PHP_LIBDIR/libsybdb.so"; then
-     AC_MSG_ERROR(Could not find $FREETDS_INSTALLATION_DIR/$PHP_LIBDIR/libsybdb.[a|so])
+  #TODO: make these path configurable again
+  if test ! -r "/usr/lib/x86_64-linux-gnu/libsybdb.a" && test ! -r "/usr/lib/x86_64-linux-gnu/libsybdb.so"; then
+     AC_MSG_ERROR(Could not find /usr/lib/x86_64-linux-gnu/libsybdb.[a|so])
   fi
 
   PHP_ADD_INCLUDE($FREETDS_INCLUDE_DIR)
