@@ -548,7 +548,7 @@ PHP_MINFO_FUNCTION(mssql)
 static void php_mssql_do_connect(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 {
 	char *host = NULL, *user = NULL, *passwd = NULL;
-	int host_len = 0, user_len = 0, passwd_len = 0;
+	size_t host_len = 0, user_len = 0, passwd_len = 0;
 	zend_bool new_link = 0;
 	char *hashed_details;
 	int hashed_details_length;
@@ -908,7 +908,7 @@ PHP_FUNCTION(mssql_select_db)
 	char *db;
 	zval *link_arg = NULL;
 	zend_resource *link_res;
-	int db_len;
+	size_t db_len;
 	int id = -1;
 	mssql_link  *mssql_ptr;
 
@@ -1347,7 +1347,8 @@ PHP_FUNCTION(mssql_query)
 	char *query;
 	zval *link_arg = NULL;
 	zend_resource *link_res;
-	int query_len, retvalue, batchsize, num_fields;
+	size_t query_len;
+	int retvalue, batchsize, num_fields;
 	zend_long zbatchsize = 0;
 	mssql_link *mssql_ptr;
 	mssql_result *result;
@@ -2038,7 +2039,7 @@ PHP_FUNCTION(mssql_min_message_severity)
 PHP_FUNCTION(mssql_init)
 {
 	char *sp_name;
-	int sp_name_len;
+	size_t sp_name_len;
 	zval *link_arg = NULL;
 	zend_resource *link_res;
 	mssql_link *mssql_ptr;
@@ -2081,7 +2082,8 @@ PHP_FUNCTION(mssql_init)
 PHP_FUNCTION(mssql_bind)
 {
 	char *param_name;
-	int param_name_len, datalen;
+	size_t param_name_len;
+	int datalen;
 	int status = 0;
 	zend_long type = 0, maxlen = -1;
 	zval *stmt, *var;
@@ -2308,7 +2310,7 @@ PHP_FUNCTION(mssql_free_statement)
 PHP_FUNCTION(mssql_guid_string)
 {
 	char *binary;
-	int binary_len;
+	size_t binary_len;
 	zend_bool sf = 0;
 	char buffer[32+1];
 	char buffer2[36+1];
