@@ -18,6 +18,9 @@
 
 /* $Id$ */
 
+//makes VSCode stop complaining
+#include "config.h"
+
 #ifdef COMPILE_DL_MSSQL
 #define HAVE_MSSQL 1
 #endif
@@ -765,8 +768,10 @@ static void php_mssql_do_connect(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 		 * it should point us to the right offset where the actual mssql link sits.
 		 * if it doesn't, open a new mssql link, add it to the resource list,
 		 * and add a pointer to it with hashed_details as the key.
+		 * 
+		 * FIXME Re-enable this
 		 */
-		if (!new_link && ((index_ptr = zend_hash_str_find_ptr(&EG(regular_list), hashed_details, hashed_details_length)) != NULL)) {
+		if (0 && !new_link && ((index_ptr = zend_hash_str_find_ptr(&EG(regular_list), hashed_details, hashed_details_length)) != NULL)) {
 			zend_ulong link;
 			zend_resource *p;
 
