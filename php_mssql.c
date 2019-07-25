@@ -2317,8 +2317,8 @@ PHP_FUNCTION(mssql_guid_string)
 	char *binary;
 	size_t binary_len;
 	zend_bool sf = 0;
-	char buffer[32+1];
-	char buffer2[36+1];
+	char buffer[32+1] = { 0 };
+	char buffer2[36+1] = { 0 };
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|b", &binary, &binary_len, &sf) == FAILURE) {
 		return;
