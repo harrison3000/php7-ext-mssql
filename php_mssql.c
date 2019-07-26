@@ -772,17 +772,6 @@ PHP_FUNCTION(mssql_close)
 
 	mssql_ptr = (mssql_link *)zend_fetch_resource2(link_res, "MS SQL-Link", le_link, le_plink);
 	
-	// fo reach (regular_list) to free assoc result
-	// NOT Need. clean in _close_mssql_link & _clean_invalid_results
-/*	ZEND_HASH_FOREACH_PTR(&EG(regular_list), p) {
-		if (p->ptr && (p->type == le_result)) {
-			res = (mssql_result *)p->ptr;
-			if (res->link_ptr == mssql_ptr) {
-				zend_list_close(p);
-			}
-		}
-	} ZEND_HASH_FOREACH_END();*/
-
 	zend_list_close(link_res);
 
 	RETURN_TRUE;
@@ -941,9 +930,6 @@ static void php_mssql_get_column_content_with_type(mssql_link *mssql_ptr,int off
 				}
 		
 				ZVAL_STRINGL(result, res_buf, res_length);
-			//	ZVAL_EMPTY_STRING(result);
-			//	Z_STRVAL_P(result) = res_buf;
-			//	Z_STRLEN_P(result) = res_length;
 			} else {
 				php_error_docref(NULL, E_WARNING, "column %d has unknown data type (%d)", offset, coltype(offset));
 				ZVAL_FALSE(result);
@@ -968,7 +954,6 @@ static void php_mssql_get_column_content_without_type(mssql_link *mssql_ptr,int 
 		column_type == SQLBINARY ||
 		column_type == SQLIMAGE) {
 		DBBINARY *bin;
-	//	unsigned char *res_buf;
 		int res_length = dbdatlen(mssql_ptr->link, offset);
 
 		if (res_length == 0) {
@@ -979,15 +964,9 @@ static void php_mssql_get_column_content_without_type(mssql_link *mssql_ptr,int 
 			return;
 		}
 
-	//	res_buf = (unsigned char *) emalloc(res_length+1);
 		bin = ((DBBINARY *)dbdata(mssql_ptr->link, offset));
-	//	res_buf[res_length] = '\0';
-	//	memcpy(res_buf, bin, res_length);
+
 		ZVAL_STRINGL(result, (char*)bin, res_length);
-		//??
-	//	ZVAL_EMPTY_STRING(result);
-	//	Z_STRVAL_P(result) = res_buf;
-	//	Z_STRLEN_P(result) = res_length;
 	}
 	else if  (dbwillconvert(coltype(offset),SQLCHAR)) {
 		DBDATEREC dateinfo;	
