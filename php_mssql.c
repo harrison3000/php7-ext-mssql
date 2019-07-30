@@ -371,7 +371,7 @@ static ZEND_RSRC_DTOR_FUNC(_free_mssql_result)
 }
 /* }}} */
 
-/* {{{ php_mssql_set_defaullt_link
+/* {{{ php_mssql_set_default_link
 */
 static void php_mssql_set_default_link(zend_resource* link)
 {
@@ -381,6 +381,14 @@ static void php_mssql_set_default_link(zend_resource* link)
 	}
 	MS_SQL_G(default_link) = link;
 	GC_REFCOUNT(link)++;
+}
+/* }}} */
+
+/* {{{ php_mssql_get_default_link
+*/
+static inline zend_resource* php_mssql_get_default_link()
+{
+	return MS_SQL_G(default_link);
 }
 /* }}} */
 
@@ -763,7 +771,7 @@ PHP_FUNCTION(mssql_close)
 	}
 
 	if (ZEND_NUM_ARGS() == 0) {
-		link_res = MS_SQL_G(default_link);
+		link_res = php_mssql_get_default_link();
 		CHECK_LINK(link_res);
 		MS_SQL_G(default_link) = NULL;
 	} else {
@@ -794,7 +802,7 @@ PHP_FUNCTION(mssql_select_db)
 	}
 
 	if (link_arg == NULL) {
-		link_res = MS_SQL_G(default_link);
+		link_res = php_mssql_get_default_link();
 		CHECK_LINK(link_res);
 	} else {
 		link_res = Z_RES_P(link_arg);
@@ -1229,7 +1237,7 @@ PHP_FUNCTION(mssql_query)
 	}
 
 	if (NULL == link_arg) {
-		link_res = MS_SQL_G(default_link);
+		link_res = php_mssql_get_default_link();
 		CHECK_LINK(link_res);
 	} else {
 		link_res = Z_RES_P(link_arg);
@@ -1918,7 +1926,7 @@ PHP_FUNCTION(mssql_init)
 	}
 
 	if (link_arg == NULL) {
-		link_res = MS_SQL_G(default_link);
+		link_res = php_mssql_get_default_link();
 		CHECK_LINK(link_res);
 	} else {
 		link_res = Z_RES_P(link_arg);
