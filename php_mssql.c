@@ -669,7 +669,6 @@ static void php_mssql_do_connect(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 		 * and add a pointer to it with hashed_details as the key.
 		 */
 		if ( !new_link && ((index_ptr = zend_hash_str_find_ptr(&EG(regular_list), hashed_details, hashed_details_length)) != NULL)) {
-			zend_ulong link;
 			zend_resource *p;
 
 			if (index_ptr->type != le_index_ptr) {
@@ -789,7 +788,6 @@ PHP_FUNCTION(mssql_select_db)
 	zval *link_arg = NULL;
 	zend_resource *link_res;
 	size_t db_len;
-	int id = -1;
 	mssql_link  *mssql_ptr;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|r", &db, &db_len, &link_arg) == FAILURE) {
@@ -1222,7 +1220,6 @@ PHP_FUNCTION(mssql_query)
 	zend_long zbatchsize = 0;
 	mssql_link *mssql_ptr;
 	mssql_result *result;
-	int id = -1;
 
 	dbsettime(MS_SQL_G(timeout));
 	batchsize = MS_SQL_G(batchsize);
@@ -1914,7 +1911,6 @@ PHP_FUNCTION(mssql_init)
 	zend_resource *link_res;
 	mssql_link *mssql_ptr;
 	mssql_statement *statement;
-	int id = -1;
 	
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|r", &sp_name, &sp_name_len, &link_arg) == FAILURE) {
 		return;
