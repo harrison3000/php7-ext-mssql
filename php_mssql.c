@@ -375,6 +375,10 @@ static ZEND_RSRC_DTOR_FUNC(_free_mssql_result)
 */
 static void php_mssql_set_default_link(zend_resource* link)
 {
+	if (MS_SQL_G(default_link) == link){
+		return;
+	}
+
 	if (MS_SQL_G(default_link) != NULL) {
 		zend_list_delete(MS_SQL_G(default_link));
 	//	GC_REFCOUNT(MS_SQL_G(default_link))--;
@@ -653,16 +657,14 @@ static void php_mssql_do_connect(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 	}
 	/* TODO re-implement the persistent link logic in a better way? */
 	{ /* non persistent */
-		zend_resource *index_ptr, new_index_ptr;
+		zend_resource *index_ptr;
 		
 		/* first we check the hash for the hashed_details key.  if it exists,
 		 * it should point us to the right offset where the actual mssql link sits.
 		 * if it doesn't, open a new mssql link, add it to the resource list,
 		 * and add a pointer to it with hashed_details as the key.
-		 * 
-		 * FIXME Re-enable this
 		 */
-		if (0 && !new_link && ((index_ptr = zend_hash_str_find_ptr(&EG(regular_list), hashed_details, hashed_details_length)) != NULL)) {
+		if ( !new_link && ((index_ptr = zend_hash_str_find_ptr(&EG(regular_list), hashed_details, hashed_details_length)) != NULL)) {
 			zend_ulong link;
 			zend_resource *p;
 
@@ -671,15 +673,19 @@ static void php_mssql_do_connect(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 				dbfreelogin(mssql.login);
 				RETURN_FALSE;
 			}
-			link = (zend_ulong) index_ptr->ptr;
-			p = zend_hash_index_find_ptr(&EG(regular_list), link);   /* check if the link is still there */
+			p = index_ptr->ptr;
+			//TODO:better link validation
 			if (p && p->ptr && (p->type==le_link || p->type==le_plink)) {
+				
+				GC_REFCOUNT(p)++;//Why is this needed????
 				RETVAL_RES(p);
+
 				php_mssql_set_default_link(p);
 				dbfreelogin(mssql.login);
 				efree(hashed_details);
 				return;
 			} else {
+				zend_list_delete(p);
 				zend_hash_str_del(&EG(regular_list), hashed_details, hashed_details_length);
 			}
 		}
@@ -725,10 +731,13 @@ static void php_mssql_do_connect(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 		/* add it to the list */
 		mssql_ptr = (mssql_link *) emalloc(sizeof(mssql_link));
 		memcpy(mssql_ptr, &mssql, sizeof(mssql_link));
-		RETVAL_RES(zend_register_resource(mssql_ptr, le_plink));
+		zend_resource *link_res;
+		link_res = zend_register_resource(mssql_ptr, le_plink);
+		RETVAL_RES(link_res);
 		
 		/* add it to the hash */
-		new_index_ptr.ptr = (void *) (zend_uintptr_t)Z_RES_HANDLE_P(return_value);
+		zend_resource new_index_ptr;
+		new_index_ptr.ptr = (void *) link_res;
 		new_index_ptr.type = le_index_ptr;
 		if (zend_hash_str_update_mem(&EG(regular_list), hashed_details, hashed_details_length, (void *) &new_index_ptr, sizeof(zend_resource)) == NULL) {
 			efree(hashed_details);
