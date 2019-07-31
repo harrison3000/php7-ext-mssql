@@ -774,27 +774,9 @@ PHP_FUNCTION(mssql_pconnect)
    Closes a connection to a MS-SQL server */
 PHP_FUNCTION(mssql_close)
 {
-	zval *link_arg = NULL;
-	zend_resource *link_res;//, *p;
-	mssql_link *mssql_ptr;
-	//mssql_result* res;
-	
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|r", &link_arg) == FAILURE) {
-		return;
-	}
-
-	if (ZEND_NUM_ARGS() == 0) {
-		link_res = php_mssql_get_default_link();
-		CHECK_LINK(link_res);
-		MS_SQL_G(default_link) = NULL;
-	} else {
-		link_res = Z_RES_P(link_arg);
-	}
-
-	mssql_ptr = (mssql_link *)zend_fetch_resource2(link_res, "MS SQL-Link", le_link, le_plink);
-	
-	zend_list_close(link_res);
-
+	//FIXME The logic originally was wrong... it kept some kind of internal reference counting...
+	//the link would only be closed when every reference was closed... but you could close the same var multiple times...
+	//better to just turn it into a nop and call it a day
 	RETURN_TRUE;
 }
 /* }}} */
