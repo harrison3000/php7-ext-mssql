@@ -736,7 +736,7 @@ static void php_mssql_do_connect(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 		mssql_ptr = (mssql_link *) emalloc(sizeof(mssql_link));
 		memcpy(mssql_ptr, &mssql, sizeof(mssql_link));
 		zend_resource *link_res;
-		link_res = zend_register_resource(mssql_ptr, le_plink);
+		link_res = zend_register_resource(mssql_ptr, le_link);
 		RETVAL_RES(link_res);
 		
 		/* add it to the hash */
