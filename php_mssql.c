@@ -348,7 +348,6 @@ static void _free_result(mssql_result *result, int free_fields)
 */
 static ZEND_RSRC_DTOR_FUNC(_free_mssql_statement)
 {
-	php_error_docref(NULL, E_WARNING, "Called statement dtor (res: %i)",res->handle);
 	mssql_statement *statement = (mssql_statement *)res->ptr;
 
 	if (statement->binds) {
@@ -364,7 +363,6 @@ static ZEND_RSRC_DTOR_FUNC(_free_mssql_statement)
 */
 static ZEND_RSRC_DTOR_FUNC(_free_mssql_result)
 {
-	php_error_docref(NULL, E_WARNING, "Called result dtor (res: %i)",res->handle);
 	mssql_result *result = (mssql_result *)res->ptr;
 
 	_free_result(result, 1);
@@ -402,7 +400,6 @@ static inline zend_resource* php_mssql_get_default_link()
 */
 static ZEND_RSRC_DTOR_FUNC(_close_mssql_link)
 {
-	php_error_docref(NULL, E_WARNING, "Called link dtor (res: %i)",res->handle);
 	mssql_link *mssql_ptr = (mssql_link *)res->ptr;
 
 	mssql_ptr->valid = 0;
@@ -418,7 +415,6 @@ static ZEND_RSRC_DTOR_FUNC(_close_mssql_link)
 */
 static ZEND_RSRC_DTOR_FUNC(_close_mssql_plink)
 {
-	php_error_docref(NULL, E_WARNING, "Called plink dtor (res: %i)",res->handle);
 	mssql_link *mssql_ptr = (mssql_link *)res->ptr;
 
 	dbclose(mssql_ptr->link);
