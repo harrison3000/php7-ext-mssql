@@ -551,6 +551,53 @@ PHP_MINFO_FUNCTION(mssql)
 	php_info_print_table_row(2, "Active Links", buf);
 
 	php_info_print_table_row(2, "Library version", MSSQL_VERSION);
+
+	char *str_version;
+	zend_resource *link_res = php_mssql_get_default_link();
+	if(link_res == NULL){
+		str_version = "Not connected";
+	}else{
+		mssql_link *mssql_ptr = (mssql_link *)zend_fetch_resource2(link_res, "MS SQL-Link", le_link, le_plink);
+		long tds_ver = dbtds(mssql_ptr->link);
+		switch(tds_ver){
+			case DBTDS_UNKNOWN:
+				str_version = "Unknown";
+				break;
+			case DBTDS_2_0:
+			case DBTDS_3_4:
+			case DBTDS_4_0:
+				str_version = "4.0 or lower";
+				break;
+			case DBTDS_4_2:
+				str_version = "4.2";
+				break;
+			case DBTDS_4_6:
+			case DBTDS_4_9_5:
+			case DBTDS_5_0:
+				str_version = "Between 4.6 and 5.0";
+				break;
+			case DBTDS_7_0:
+				str_version = "7.0";
+				break;
+			case DBTDS_7_1:
+				str_version = "7.1 (aka 8.0)";
+				break;
+			case DBTDS_7_2:
+				str_version = "7.2 (aka 9.0)";
+				break;
+			case DBTDS_7_3:
+				str_version = "7.3";
+				break;
+			case DBTDS_7_4:
+				str_version = "7.4";
+				break;
+			default:
+				str_version = "Higher than 7.4";
+		}
+	}
+	
+	php_info_print_table_row(2, "TDS Protocol version", str_version);
+
 	php_info_print_table_end();
 
 	DISPLAY_INI_ENTRIES();
