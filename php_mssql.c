@@ -1145,6 +1145,8 @@ static int _mssql_fetch_batch(mssql_link *mssql_ptr, mssql_result *result, int r
 	int i, j = 0;
 	char computed_buf[16];
 
+	zend_bool old_version = (dbtds(mssql_ptr->link) < DBTDS_7_0);
+
 	if (!result->have_fields) {
 		for (i=0; i<result->num_fields; i++) {
 			char *source = NULL;
@@ -1190,6 +1192,10 @@ static int _mssql_fetch_batch(mssql_link *mssql_ptr, mssql_result *result, int r
 					result->fields[i].numeric = 0;
 					break;
 			}
+
+			if(old_version && strlen(result->fields[i].name) == 30){
+				php_error_docref(NULL, E_WARNING, "Column name '%s' possibly truncated due to TDS Protocol version.",result->fields[i].name);
+			}
 		}
 		result->have_fields = 1;
 	}
@@ -1207,6 +1213,11 @@ static int _mssql_fetch_batch(mssql_link *mssql_ptr, mssql_result *result, int r
 		for (j=0; j<result->num_fields; j++) {
 			//INIT_ZVAL(result->data[i][j]);
 			MS_SQL_G(get_column_content(mssql_ptr, j+1, &result->data[i][j], result->fields[j].type TSRMLS_CC));
+			zval z = result->data[i][j];
+			int z_len = Z_TYPE(z) == IS_STRING ? Z_STRLEN(z) : 0;
+			if(old_version && (result->fields[j].type == SQLCHAR || result->fields[j].type == SQLVARCHAR) && z_len == 255){
+				php_error_docref(NULL, E_WARNING, "Value on column '%s' possibly truncated due to TDS Protocol version.",result->fields[j].name);
+			}
 		}
 		if (i<result->batchsize || result->batchsize==0) {
 			i++;
