@@ -214,6 +214,7 @@ ZEND_GET_MODULE(mssql)
 #endif
 
 #define CHECK_LINK(link) { if (link==NULL) { php_error_docref(NULL, E_WARNING, "A link to the server could not be established"); RETURN_FALSE; } }
+#define CHECK_RES(res) { if (res==NULL) { RETURN_FALSE; } }
 
 /* {{{ PHP_INI_DISP
 */
@@ -1252,6 +1253,7 @@ PHP_FUNCTION(mssql_fetch_batch)
 	}
 
 	result = (mssql_result *)zend_fetch_resource(Z_RES_P(result_arg), "MS SQL-result", le_result);
+	CHECK_RES(result);
 
 	mssql_ptr = result->mssql_ptr;
 	_free_result(result, 0);
@@ -1372,6 +1374,7 @@ PHP_FUNCTION(mssql_free_result)
 	}
 
 	result = (mssql_result *)zend_fetch_resource(Z_RES_P(result_arg), "MS SQL-result", le_result);
+	CHECK_RES(result);
 
 	/* Release remaining results */
 	do {
@@ -1416,6 +1419,7 @@ PHP_FUNCTION(mssql_num_rows)
 	}
 
 	result = (mssql_result *)zend_fetch_resource(Z_RES_P(result_arg), "MS SQL-result", le_result);
+	CHECK_RES(result);
 
 	RETURN_LONG(result->num_rows);
 }
@@ -1437,6 +1441,7 @@ PHP_FUNCTION(mssql_num_fields)
 	}
 
 	result = (mssql_result *)zend_fetch_resource(Z_RES_P(result_arg), "MS SQL-result", le_result);
+	CHECK_RES(result);
 
 	RETURN_LONG(result->num_fields);
 }
@@ -1469,6 +1474,7 @@ static void php_mssql_fetch_hash(INTERNAL_FUNCTION_PARAMETERS, int result_type)
 	}
 
 	result = (mssql_result *)zend_fetch_resource(Z_RES_P(result_arg), "MS SQL-result", le_result);
+	CHECK_RES(result);
 
 	if (MS_SQL_G(server_message)) {
 		efree(MS_SQL_G(server_message));
@@ -1577,6 +1583,7 @@ PHP_FUNCTION(mssql_data_seek)
 	}
 
 	result = (mssql_result *)zend_fetch_resource(Z_RES_P(result_arg), "MS SQL-result", le_result);
+	CHECK_RES(result);
 
 	if (offset < 0 || offset >= result->num_rows) {
 		php_error_docref(NULL, E_WARNING, "Bad row offset");
@@ -1664,6 +1671,7 @@ PHP_FUNCTION(mssql_fetch_field)
 	}
 
 	result = (mssql_result *)zend_fetch_resource(Z_RES_P(result_arg), "MS SQL-result", le_result);
+	CHECK_RES(result);
 	
 	if (field_offset==-1) {
 		field_offset = result->cur_field;
@@ -1704,6 +1712,7 @@ PHP_FUNCTION(mssql_field_length)
 	}
 
 	result = (mssql_result *)zend_fetch_resource(Z_RES_P(result_arg), "MS SQL-result", le_result);
+	CHECK_RES(result);
 
 	if (field_offset==-1) {
 		field_offset = result->cur_field;
@@ -1738,6 +1747,7 @@ PHP_FUNCTION(mssql_field_name)
 	}
 
 	result = (mssql_result *)zend_fetch_resource(Z_RES_P(result_arg), "MS SQL-result", le_result);
+	CHECK_RES(result);
 	
 	if (field_offset==-1) {
 		field_offset = result->cur_field;
@@ -1773,6 +1783,7 @@ PHP_FUNCTION(mssql_field_type)
 	}
 
 	result = (mssql_result *)zend_fetch_resource(Z_RES_P(result_arg), "MS SQL-result", le_result);
+	CHECK_RES(result);
 	
 	if (field_offset==-1) {
 		field_offset = result->cur_field;
@@ -1808,6 +1819,7 @@ PHP_FUNCTION(mssql_field_seek)
 	}
 
 	result = (mssql_result *)zend_fetch_resource(Z_RES_P(result_arg), "MS SQL-result", le_result);
+	CHECK_RES(result);
 	
 	if (field_offset<0 || field_offset >= result->num_fields) {
 		php_error_docref(NULL, E_WARNING, "Bad column offset");
@@ -1837,6 +1849,7 @@ PHP_FUNCTION(mssql_result)
 	}
 
 	result = (mssql_result *)zend_fetch_resource(Z_RES_P(result_arg), "MS SQL-result", le_result);
+	CHECK_RES(result);
 
 	if (row < 0 || row >= result->num_rows) {
 		php_error_docref(NULL, E_WARNING, "Bad row offset (%ld)", row);
@@ -1892,6 +1905,7 @@ PHP_FUNCTION(mssql_next_result)
 	}
 
 	result = (mssql_result *)zend_fetch_resource(Z_RES_P(result_arg), "MS SQL-result", le_result);
+	CHECK_RES(result);
 
 	mssql_ptr = result->mssql_ptr;
 	retvalue = dbresults(mssql_ptr->link);
@@ -2022,10 +2036,8 @@ PHP_FUNCTION(mssql_bind)
 	}
 	
 	statement = (mssql_statement *)zend_fetch_resource(Z_RES_P(stmt), "MS SQL-Statement", le_statement);
-
-	if (statement==NULL) {
-		RETURN_FALSE;
-	}
+	CHECK_RES(statement);
+	
 	mssql_ptr=statement->link;
 
 	/* modify datalen and maxlen according to dbrpcparam documentation */
@@ -2124,6 +2136,7 @@ PHP_FUNCTION(mssql_execute)
 	}
 
 	statement = (mssql_statement *)zend_fetch_resource(Z_RES_P(stmt), "MS SQL-Statement", le_statement);
+	CHECK_RES(statement);
 
 	mssql_ptr=statement->link;
 	exec_retval = dbrpcexec(mssql_ptr->link);
@@ -2209,10 +2222,7 @@ PHP_FUNCTION(mssql_free_statement)
 	}
 	
 	statement = (mssql_statement *)zend_fetch_resource(Z_RES_P(stmt), "MS SQL-Statement", le_statement);
-
-	if (NULL == statement) {
-		RETURN_FALSE;
-	}
+	CHECK_RES(statement);
 
 	/* Release remaining results */
 	do {
