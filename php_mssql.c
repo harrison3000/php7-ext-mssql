@@ -1880,8 +1880,7 @@ PHP_FUNCTION(mssql_result)
 			break;
 	}
 
-	*return_value = result->data[row][field_offset];
-	zval_copy_ctor(return_value);
+	ZVAL_COPY(return_value,&(result->data[row][field_offset]));
 }
 /* }}} */
 
