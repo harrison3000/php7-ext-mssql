@@ -1489,19 +1489,17 @@ static void php_mssql_fetch_hash(INTERNAL_FUNCTION_PARAMETERS, int result_type)
 	
 	for (i=0; i<result->num_fields; i++) {
 		if (Z_TYPE(result->data[result->cur_row][i]) != IS_NULL) {
-			char *data;
-			int data_len;
-
 			if (Z_TYPE(result->data[result->cur_row][i]) == IS_STRING) {
-				data = Z_STRVAL(result->data[result->cur_row][i]);
-				data_len = Z_STRLEN(result->data[result->cur_row][i]);
+				zval data;
 
 				if (result_type & MSSQL_NUM) {
-					add_index_stringl(return_value, i, data, data_len);
+					ZVAL_COPY(&data,&(result->data[result->cur_row][i]));
+					add_index_zval(return_value, i, &data);
 				}
 				
 				if (result_type & MSSQL_ASSOC) {
-					add_assoc_stringl(return_value, result->fields[i].name, data, data_len);
+					ZVAL_COPY(&data,&(result->data[result->cur_row][i]));
+					add_assoc_zval(return_value, result->fields[i].name, &data);
 				}
 			}
 			else if (Z_TYPE(result->data[result->cur_row][i]) == IS_LONG) {
