@@ -385,7 +385,7 @@ static void php_mssql_set_default_link(zend_resource* link)
 	//	GC_REFCOUNT(MS_SQL_G(default_link))--;
 	}
 	MS_SQL_G(default_link) = link;
-	GC_REFCOUNT(link)++;
+	GC_ADDREF(link);
 }
 /* }}} */
 
@@ -724,7 +724,7 @@ static void php_mssql_do_connect(INTERNAL_FUNCTION_PARAMETERS, int persistent)
 			//TODO:better link validation
 			if (p && p->ptr && (p->type==le_link || p->type==le_plink)) {
 				
-				GC_REFCOUNT(p)++;//Why is this needed????
+				GC_ADDREF(p);
 				RETVAL_RES(p);
 
 				php_mssql_set_default_link(p);
