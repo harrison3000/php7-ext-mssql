@@ -1214,6 +1214,7 @@ static int _mssql_fetch_batch(mssql_link *mssql_ptr, mssql_result *result, int r
 		for (j=0; j<result->num_fields; j++) {
 			//INIT_ZVAL(result->data[i][j]);
 			MS_SQL_G(get_column_content(mssql_ptr, j+1, &result->data[i][j], result->fields[j].type));
+
 			zval z = result->data[i][j];
 			int z_len = Z_TYPE(z) == IS_STRING ? Z_STRLEN(z) : 0;
 			if(old_version && (result->fields[j].type == SQLCHAR || result->fields[j].type == SQLVARCHAR) && z_len == 255){
@@ -1225,8 +1226,9 @@ static int _mssql_fetch_batch(mssql_link *mssql_ptr, mssql_result *result, int r
 			dbclrbuf(mssql_ptr->link,DBLASTROW(mssql_ptr->link)); 
 			retvalue=dbnextrow(mssql_ptr->link);
 		}
-		else
+		else {
 			break;
+		}
 		result->lastresult = retvalue;
 	}
 	if (result->statement && (retvalue == NO_MORE_RESULTS || retvalue == NO_MORE_RPC_RESULTS)) {
