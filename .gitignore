@@ -18,5 +18,6 @@ modules/
 mssql.la
 php_mssql.lo
 run-tests.php
+php_mssql.dep
 
 .vscode/
