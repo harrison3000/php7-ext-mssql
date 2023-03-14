@@ -817,9 +817,9 @@ PHP_FUNCTION(mssql_pconnect)
    Closes a connection to a MS-SQL server */
 PHP_FUNCTION(mssql_close)
 {
-	//FIXME The logic originally was wrong... it kept some kind of internal reference counting...
-	//the link would only be closed when every reference was closed... but you could close the same var multiple times...
-	//better to just turn it into a nop and call it a day
+	//The logic originally was flawed: it kept some kind of internal reference counting
+	//the link would only be really closed when every reference was closed, but the default link would still be valid (?)
+	//better to just turn this into a nop and call it a day
 	RETURN_TRUE;
 }
 /* }}} */
